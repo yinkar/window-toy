@@ -4,20 +4,20 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   
   windowArray = [
-    new Window({
+    new AppWindow({
       x: 30, y: 30, 
       width: 300, height: 330, 
       title: 'Gariban Kedi',
       emojiIcon: '🐈️'
     }),
-    new Window({
+    new AppWindow({
       x: 280, y: 280, 
       width: 280, height: 105, 
       title: 'Denek',
       emojiIcon: '👾',
       content: 'Zaman yolcusu kalmasın'
     }),/*
-    new Window({
+    new AppWindow({
       x: 100, y: 350, 
       width: 300, height: 200, 
       title: 'Tost Makinesi',
@@ -28,8 +28,31 @@ function setup() {
   
 //  windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E💣️%3C/text%3E%3C/svg%3E`, 60, 20, 140, 140);
   
-  windowArray[0].addButton(`Test`, 100, 240, 100, 25, () => {
-    alert('OK');
+  windowArray[0].addButton(`Test`, 100, 240, 100, 25, (w) => {
+    //alert('OK');
+        
+    const emojis = [...'🚗🚲🛴🚿🌒🌡☄🔥'];
+       w.addImage(`data:image/svg+xml,\
+%3Csvg%20xmlns='http://www\
+.w3.org/2000/svg'%20viewBox='0%200%\
+2020%2020'%3E%3Ctext%20x='0'%20\
+y='14'%3E${(
+         emojis.at(
+           int(random(0, emojis.length))
+         )
+       )}%3C/text%3E%3C/svg%3E`, 
+        random(0, w.width - 45), 
+        random(90, w.height) - 90, 
+        ...Array(2).fill(random(20, 40))
+       );
+    
+    
+    w.images.at(-1).image = loadImage(w.images.at(-1).url);
+    
+    w.title = w.title.replace(
+      /\s[0-9]+/g, 
+      ''
+    ) + ' ' + str(w.images.length - 1);
   });
    windowArray[1].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E🚀%3C/text%3E%3C/svg%3E`, 40, 20, 40, 40);
   
@@ -48,15 +71,21 @@ function setup() {
 }
 
 function draw() {
-  background(20);
+  background(35);
   
   textAlign(LEFT, TOP);
   ellipseMode(CORNER);
   
   windowArray.forEach(w => {
+    push();
+    drawingContext.shadowOffsetX = 3;
+    drawingContext.shadowOffsetY = 3;
+    drawingContext.shadowBlur = 10;
+    drawingContext.shadowColor = 'rgba(0, 0, 0, 0.5)';
     stroke(150, 150, 220);
     fill(100, 100, 200);
     rect(w.x, w.y, w.width, w.height, 2);
+    pop();
 
     stroke(120, 120, 220);
     fill(90, 90, 200);
@@ -74,8 +103,8 @@ function draw() {
     noStroke();
     fill(200, 200, 255);
     textFont('monospace');
-    textSize(20);
-    text(w.title, w.x + 30, w.y + 7);
+    textSize(18);
+    text(w.title, w.x + 30, w.y + 8);
     
     let closeButtonColor = w.titleButtons.closeButton.color.normal;
     
@@ -90,7 +119,7 @@ function draw() {
         mouseY > e.y &&
         mouseX < e.x + e.width &&
         mouseY < e.y + e.height)
-      }))
+      }) || w.zIndex === windowArray.length - 1)
     ) {
       closeButtonColor = w.titleButtons.closeButton.color.hover;
     }
@@ -98,10 +127,14 @@ function draw() {
     noStroke();
     fill(color(closeButtonColor.bg));
     rect(w.x + w.width - 2 - 25, w.y + 6, 20, 20, 3);
-    fill(color(closeButtonColor.fg));
-    textSize(24);
-    textFont('cursive');
-    text('x', w.x + w.width - 2 - 22, w.y + 4);
+    
+    push();
+    strokeWeight(3);
+    stroke(color(closeButtonColor.fg));
+    strokeCap(ROUND);
+    line(w.x + w.width - 2 - 18, w.y + 13, w.x + w.width - 2 - 12, w.y + 19);
+    line(w.x + w.width - 2 - 12, w.y + 13, w.x + w.width - 2 - 18, w.y + 19);
+    pop();
     
     stroke(160, 160, 220);
     fill(120, 120, 220);
@@ -161,10 +194,10 @@ function mousePressed() {
   
   windowArray.forEach((w, i) => {
     if (
-      mouseX > w.x + 2 &&
-      mouseY > w.y + 2 &&
-      mouseX < w.x + w.width - 4 &&
-      mouseY < w.y + 32 - 4 &&
+      mouseX > w.x &&
+      mouseY > w.y &&
+      mouseX < w.x + w.width &&
+      mouseY < w.y + w.height &&
       (!windowArray.find(e => {
         return (e !== w &&
         mouseX > e.x &&
@@ -179,11 +212,18 @@ function mousePressed() {
         mouseY < w.y + 6 + 20
       )
     ) {
-      w.grabbed = true;
-      w.clickedPoint = {
-        x: mouseX - w.x,
-        y: mouseY - w.y
-      }
+      if (
+        mouseX > w.x + 2 &&
+        mouseY > w.y + 2 &&
+        mouseX < w.x + w.width - 4 &&
+        mouseY < w.y + 32 - 4
+      ) {
+          w.grabbed = true;
+          w.clickedPoint = {
+            x: mouseX - w.x,
+            y: mouseY - w.y
+          }
+        }
       
       let maxZIndex = windowArray.length - 1;
             
@@ -234,7 +274,7 @@ function mouseReleased() {
           mouseY < b.y + b.height)
         }) || w.zIndex === windowArray.length - 1)
       ) {
-        b.action();
+        b.action(w);
       }
     });
   });

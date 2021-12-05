@@ -1,4 +1,4 @@
-class Window {
+class AppWindow {
   constructor(params) {
     let {
       x, y, 
@@ -74,14 +74,14 @@ class Window {
     });
   }
   
-  addButton(text, x, y, width, height, action) {
+  addButton(text, x, y, width, height, action) {    
     this.buttons.push({
       text: text,
       x: x,
       y: y,
       width: width,
       height: height,
-      action: action
+      action: action.bind(this)
     });
   }
   
