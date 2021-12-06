@@ -1,34 +1,51 @@
 let windowArray;
 
+function chunkString(str, len) {
+    return str.toString().match(new RegExp(`.{1,${parseInt(len)}}`, 'g'))
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   
   windowArray = [
     new AppWindow({
-      x: 30, y: 30, 
+      x: random(windowWidth - 300), y: random(windowHeight - 220), 
+      width: 300, height: 220, 
+      title: 'Random Cat Photo',
+      emojiIcon: '🐱‍🏍'
+    }),
+    new AppWindow({
+      x: random(windowWidth - 300), y: random(windowHeight - 330), 
       width: 300, height: 330, 
       title: 'Gariban Kedi',
       emojiIcon: '🐈️'
     }),
     new AppWindow({
-      x: 280, y: 280, 
+      x: random(windowWidth - 280), y: random(windowHeight - 105), 
       width: 280, height: 105, 
       title: 'Denek',
       emojiIcon: '👾',
       content: 'Zaman yolcusu kalmasın'
     }),
     new AppWindow({
-      x: 100, y: 350, 
+      x: random(windowWidth - 300), y: random(windowHeight - 200), 
       width: 300, height: 200, 
       title: 'Tost Makinesi',
       emojiIcon: '🐱‍👤'
+    }),
+    new AppWindow({
+      x: random(windowWidth - 500), y: random(windowHeight - 160),
+      width: 500, height: 160,
+      title: 'Random Cat Facts',
+      emojiIcon: '😼',
+      content: 'Use "Get" button to get new fact'
     })
   ];
-   windowArray[0].addImage(`https://yinkar.github.io/pixelart/images/01-gariban-kedi.png`, 0, 0, 292, 290);
+   windowArray[1].addImage(`https://yinkar.github.io/pixelart/images/01-gariban-kedi.png`, 0, 0, 292, 290);
   
-  windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E💣️%3C/text%3E%3C/svg%3E`, 60, 20, 140, 140);
+  windowArray[3].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E💣️%3C/text%3E%3C/svg%3E`, 60, 20, 140, 140);
   
-  windowArray[0].addButton(`Test`, 100, 240, 100, 25, (w) => {
+  windowArray[1].addButton(`Test`, 100, 240, 100, 25, (w) => {
     //alert('OK');
         
     const emojis = [...'🚗🚲🛴🚿🌒🌡☄🔥'];
@@ -54,7 +71,26 @@ y='14'%3E${(
       ''
     ) + ' ' + str(w.images.length - 1);
   });
-   windowArray[1].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E🚀%3C/text%3E%3C/svg%3E`, 40, 20, 40, 40);
+  
+  
+  windowArray[0].addButton(`Get New Photo`, 60, 145, 180, 25, (w) => {
+    fetch('https://thatcopy.pw/catapi/rest/')
+      .then(r => r.json())
+      .then(d => {
+        w.addImage(d.url, 0, 0, 292, 180);
+
+        w.images.at(-1).image = loadImage(w.images.at(-1).url);
+      });
+  });
+  
+  windowArray[4].addButton(`Get New Fact`, 160, 85, 180, 25, (w) => {    
+    fetch('https://meowfacts.herokuapp.com/')
+      .then(r => r.json())
+      .then(d => {
+        w.content = d.data.toString().substring(0, 370);
+      });
+  });
+   windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E🚀%3C/text%3E%3C/svg%3E`, 40, 20, 40, 40);
   
   windowArray.forEach((w, i) => {
     w.zIndex = i;
@@ -151,11 +187,13 @@ function draw() {
     rect(w.x + 4, w.y + 36, w.width - 8, w.height - 8 - 32, 2);
     
     if (![null, undefined, ''].includes(w.content)) {
-      textSize(12);
-      textFont('sans-serif');
+      w.content = chunkString(w.content, w.width / 8).join('\n');
+      
+      textSize(14);
+      textFont('monospace');
       noStroke();
       fill(0);
-      text(w.content, w.x + 8, w.y + 40);
+      text(w.content, w.x + 12, w.y + 44);
     }
     
     w.images.forEach(e => {
@@ -270,56 +308,6 @@ function mousePressed() {
     }
   });
   
-  
-  /*
-  windowArray.forEach((w, i) => {
-    if (
-      mouseX > w.x &&
-      mouseY > w.y &&
-      mouseX < w.x + w.width &&
-      mouseY < w.y + w.height &&
-      (!windowArray.find(e => {
-        return (e !== w &&
-        mouseX > e.x &&
-        mouseY > e.y &&
-        mouseX < e.x + e.width &&
-        mouseY < e.y + e.height)
-      }) || w.zIndex === windowArray.length - 1) &&
-      !(
-        mouseX > w.x + w.width - 2 - 25 &&
-        mouseY > w.y + 6 &&
-        mouseX < w.x + w.width - 2 - 25 + 20 &&
-        mouseY < w.y + 6 + 20
-      )
-    ) {
-      if (
-        mouseX > w.x + 2 &&
-        mouseY > w.y + 2 &&
-        mouseX < w.x + w.width - 4 &&
-        mouseY < w.y + 32 - 4
-      ) {
-          w.grabbed = true;
-          w.clickedPoint = {
-            x: mouseX - w.x,
-            y: mouseY - w.y
-          }
-        }
-      
-      let maxZIndex = windowArray.length - 1;
-            
-      windowArray.filter(e => e.zIndex > w.zIndex).forEach(e => {
-        e.zIndex--;
-      });
-      
-      w.zIndex = maxZIndex;
-      
-      windowArray.forEach(e => e.isOnTop = false);
-      w.isOnTop = true;
-    }
-    
-  });
-
-    */
   windowArray.sort((a, b) => {
     if (a.zIndex < b.zIndex) return -1; 
     if (a.zIndex > b.zIndex) return 1; 
