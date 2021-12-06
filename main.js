@@ -16,17 +16,17 @@ function setup() {
       title: 'Denek',
       emojiIcon: '👾',
       content: 'Zaman yolcusu kalmasın'
-    }),/*
+    }),
     new AppWindow({
       x: 100, y: 350, 
       width: 300, height: 200, 
       title: 'Tost Makinesi',
       emojiIcon: '🐱‍👤'
-    })*/
+    })
   ];
    windowArray[0].addImage(`https://yinkar.github.io/pixelart/images/01-gariban-kedi.png`, 0, 0, 292, 290);
   
-//  windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E💣️%3C/text%3E%3C/svg%3E`, 60, 20, 140, 140);
+  windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E💣️%3C/text%3E%3C/svg%3E`, 60, 20, 140, 140);
   
   windowArray[0].addButton(`Test`, 100, 240, 100, 25, (w) => {
     //alert('OK');
@@ -113,13 +113,23 @@ function draw() {
       mouseY > w.y + 6 &&
       mouseX < w.x + w.width - 2 - 25 + 20 &&
       mouseY < w.y + 6 + 20 &&
-      (!windowArray.find(e => {
-        return (e !== w &&
-        mouseX > e.x &&
-        mouseY > e.y &&
-        mouseX < e.x + e.width &&
-        mouseY < e.y + e.height)
-      }) || w.zIndex === windowArray.length - 1)
+      (
+        (w.zIndex === windowArray.length - 1) ||
+        (
+          ![
+            ...windowArray.slice(0, windowArray.indexOf(w)), 
+            ...windowArray.slice(windowArray.indexOf(w) + 1)
+          ].some(e => {
+            return (
+              mouseX > e.x &&
+              mouseY > e.y &&
+              mouseX < e.x + e.width &&
+              mouseY < e.y + e.height &&
+              e.zIndex > w.zIndex
+            )
+          })
+        )
+      )
     ) {
       closeButtonColor = w.titleButtons.closeButton.color.hover;
     }
@@ -159,13 +169,23 @@ function draw() {
         mouseY > w.y + b.y + 36 &&
         mouseX < w.x + b.x + 4 + b.width &&
         mouseY < w.y + b.y + 36 + b.height && 
-        (!windowArray.find(b => {
-          return (b !== w &&
-          mouseX > b.x &&
-          mouseY > b.y &&
-          mouseX < b.x + b.width &&
-          mouseY < b.y + b.height)
-        }) || w.zIndex === windowArray.length - 1)
+        (
+          (w.zIndex === windowArray.length - 1) ||
+          (
+            ![
+              ...windowArray.slice(0, windowArray.indexOf(w)), 
+              ...windowArray.slice(windowArray.indexOf(w) + 1)
+            ].some(e => {
+              return (
+                mouseX > e.x &&
+                mouseY > e.y &&
+                mouseX < e.x + e.width &&
+                mouseY < e.y + e.height &&
+                e.zIndex > w.zIndex
+              )
+            })
+          )
+        )
       ) {
         fill(120, 120, 200);
       }
@@ -192,6 +212,66 @@ function draw() {
 function mousePressed() {
   if (windowArray.find(e => e.grabbed)) return;
   
+  windowArray.forEach((w, i) => {
+    if (
+      (
+        mouseX > w.x &&
+        mouseY > w.y &&
+        mouseX < w.x + w.width &&
+        mouseY < w.y + w.height
+      ) &&
+      !(
+        mouseX > w.x + w.width - 2 - 25 &&
+        mouseY > w.y + 6 &&
+        mouseX < w.x + w.width - 2 - 25 + 20 &&
+        mouseY < w.y + 6 + 20
+      ) &&
+      (
+        (w.zIndex === windowArray.length - 1) ||
+        (
+          ![
+            ...windowArray.slice(0, windowArray.indexOf(w)), 
+            ...windowArray.slice(windowArray.indexOf(w) + 1)
+          ].some(e => {
+            return (
+              mouseX > e.x &&
+              mouseY > e.y &&
+              mouseX < e.x + e.width &&
+              mouseY < e.y + e.height &&
+              e.zIndex > w.zIndex
+            )
+          })
+        )
+      )
+    ) {
+      if (
+        mouseX > w.x + 2 &&
+        mouseY > w.y + 2 &&
+        mouseX < w.x + w.width - 4 &&
+        mouseY < w.y + 32 - 4
+      ) {
+          w.grabbed = true;
+          w.clickedPoint = {
+            x: mouseX - w.x,
+            y: mouseY - w.y
+          }
+        }
+      
+      let maxZIndex = windowArray.length - 1;
+            
+      windowArray.filter(e => e.zIndex > w.zIndex).forEach(e => {
+        e.zIndex--;
+      });
+      
+      w.zIndex = maxZIndex;
+      
+      windowArray.forEach(e => e.isOnTop = false);
+      w.isOnTop = true;
+    }
+  });
+  
+  
+  /*
   windowArray.forEach((w, i) => {
     if (
       mouseX > w.x &&
@@ -236,8 +316,10 @@ function mousePressed() {
       windowArray.forEach(e => e.isOnTop = false);
       w.isOnTop = true;
     }
+    
   });
 
+    */
   windowArray.sort((a, b) => {
     if (a.zIndex < b.zIndex) return -1; 
     if (a.zIndex > b.zIndex) return 1; 
