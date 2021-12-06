@@ -1,9 +1,5 @@
 let windowArray;
 
-function chunkString(str, len) {
-    return str.toString().match(new RegExp(`.{1,${parseInt(len)}}`, 'g'))
-}
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   
@@ -45,9 +41,7 @@ function setup() {
   
   windowArray[3].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E💣️%3C/text%3E%3C/svg%3E`, 60, 20, 140, 140);
   
-  windowArray[1].addButton(`Test`, 100, 240, 100, 25, (w) => {
-    //alert('OK');
-        
+  windowArray[1].addButton(`Test`, 100, 240, 100, 25, (w) => {       
     const emojis = [...'🚗🚲🛴🚿🌒🌡☄🔥'];
        w.addImage(`data:image/svg+xml,\
 %3Csvg%20xmlns='http://www\
@@ -74,12 +68,21 @@ y='14'%3E${(
   
   
   windowArray[0].addButton(`Get New Photo`, 60, 145, 180, 25, (w) => {
+    w.content = 'Loading...';
+    
     fetch('https://thatcopy.pw/catapi/rest/')
       .then(r => r.json())
       .then(d => {
-        w.addImage(d.url, 0, 0, 292, 180);
+        w.images.splice(-1);
+      
+        w.addImage(d.url, 0, 0, 292, 180, 0, 0, 4672, 2880);
 
-        w.images.at(-1).image = loadImage(w.images.at(-1).url);
+        w.images.at(-1).image = loadImage(
+          w.images.at(-1).url, 
+          () => {
+            w.content = '';
+          }
+        );
       });
   });
   
@@ -87,7 +90,13 @@ y='14'%3E${(
     fetch('https://meowfacts.herokuapp.com/')
       .then(r => r.json())
       .then(d => {
-        w.content = d.data.toString().substring(0, 370);
+        let croppedData = d.data.toString().substring(0, 200).trim();
+            
+        if (croppedData.length < d.data.toString().length) {
+          croppedData = `${croppedData}...`;
+        }
+      
+        w.content = croppedData;
       });
   });
    windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E🚀%3C/text%3E%3C/svg%3E`, 40, 20, 40, 40);
@@ -186,18 +195,34 @@ function draw() {
     fill(120, 120, 220);
     rect(w.x + 4, w.y + 36, w.width - 8, w.height - 8 - 32, 2);
     
-    if (![null, undefined, ''].includes(w.content)) {
-      w.content = chunkString(w.content, w.width / 8).join('\n');
-      
+    if (![null, undefined, ''].includes(w.content)) {      
       textSize(14);
       textFont('monospace');
       noStroke();
       fill(0);
-      text(w.content, w.x + 12, w.y + 44);
+      text(w.content, w.x + 12, w.y + 44, w.width - 8, w.height);
     }
     
     w.images.forEach(e => {
-      image(e.image, w.x + 4 + e.x, w.y + 36 + e.y, e.width, e.height);
+      if (
+        e.sX !== undefined && e.sY !== undefined &&
+        e.sWidth !== undefined && e.sHeight !== undefined
+      ) {      
+        image(
+          e.image, 
+          w.x + 4 + e.x, 
+          w.y + 36 + e.y, 
+          e.width, 
+          e.height,
+          e.sX,
+          e.sY,
+          e.sWidth,
+          e.sHeight
+         );
+      }
+      else {
+        image(e.image, w.x + 4 + e.x, w.y + 36 + e.y, e.width, e.height);
+      }
     });
     
     w.buttons.forEach(b => {
