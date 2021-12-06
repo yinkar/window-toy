@@ -142,19 +142,19 @@ function draw() {
     rect(w.x + 2, w.y + 2, w.width - 4, 32 - 2, 2);
 
     if (![null, undefined, ''].includes(w.icon)) {
-      image(w.icon, w.x + 8, w.y + 8, 16, 16);
+      image(w.icon, w.x + 8, w.y + 9, 16, 16);
     }
     else {
-      stroke(120, 120, 220);
-      fill(120, 120, 230);
-      circle(w.x + 8, w.y + 8, 16);
+      stroke(120, 120, 120);
+      fill(200, 200, 200);
+      circle(w.x + 8, w.y + 9, 16);
     }
 
     noStroke();
     fill(color('rgba(200, 200, 200, 1)'));
     textFont('monospace');
     textSize(18);
-    text(w.title, w.x + 30, w.y + 8);
+    text(w.title, w.x + 30, w.y + 9);
     
     let closeButtonColor = w.titleButtons.closeButton.color.normal;
     
