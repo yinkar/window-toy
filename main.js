@@ -126,15 +126,20 @@ function draw() {
     drawingContext.shadowOffsetX = 3;
     drawingContext.shadowOffsetY = 3;
     drawingContext.shadowBlur = 10;
-    drawingContext.shadowColor = 'rgba(0, 0, 0, 0.5)';
-    stroke(150, 150, 220);
-    fill(100, 100, 200);
+    drawingContext.shadowColor = 'rgba(0, 0, 0, 0.9)';
+    stroke(color('rgba(255, 255, 255, .15)'));
+    fill(color('rgba(0, 0, 0, .5)'));
     rect(w.x, w.y, w.width, w.height, 2);
     pop();
 
-    stroke(120, 120, 220);
-    fill(90, 90, 200);
-    rect(w.x + 2, w.y + 2, w.width - 4, 32 - 4, 2);
+    stroke(color('rgba(255, 255, 255, .1)'));
+    fill(color('rgba(0, 0, 0, .5)'));
+    
+    if (w.zIndex !== windowArray.length - 1) {
+      fill(color('rgba(50, 50, 50, .5)'));      
+    }
+    
+    rect(w.x + 2, w.y + 2, w.width - 4, 32 - 2, 2);
 
     if (![null, undefined, ''].includes(w.icon)) {
       image(w.icon, w.x + 8, w.y + 8, 16, 16);
@@ -146,7 +151,7 @@ function draw() {
     }
 
     noStroke();
-    fill(200, 200, 255);
+    fill(color('rgba(200, 200, 200, 1)'));
     textFont('monospace');
     textSize(18);
     text(w.title, w.x + 30, w.y + 8);
@@ -191,15 +196,15 @@ function draw() {
     line(w.x + w.width - 2 - 12, w.y + 13, w.x + w.width - 2 - 18, w.y + 19);
     pop();
     
-    stroke(160, 160, 220);
-    fill(120, 120, 220);
+    stroke('rgba(255, 255, 255, .1)');
+    fill(color('rgba(20, 20, 20, 1)'));
     rect(w.x + 4, w.y + 36, w.width - 8, w.height - 8 - 32, 2);
     
     if (![null, undefined, ''].includes(w.content)) {      
       textSize(14);
       textFont('monospace');
       noStroke();
-      fill(0);
+      fill(240);
       text(w.content, w.x + 12, w.y + 44, w.width - 8, w.height);
     }
     
@@ -226,7 +231,8 @@ function draw() {
     });
     
     w.buttons.forEach(b => {
-      fill(80, 80, 160);
+      stroke(color('rgba(255, 255, 255, .1)'))
+      fill(color('rgba(40, 40, 40, 1)'));
       if (
         mouseX > w.x + b.x + 4 &&
         mouseY > w.y + b.y + 36 &&
@@ -250,16 +256,16 @@ function draw() {
           )
         )
       ) {
-        fill(120, 120, 200);
+        fill(color('rgba(70, 70, 70, .9)'));
       }
-      rect(w.x + 4 + b.x, w.y + 36 + b.y, b.width, b.height);
+      rect(w.x + 4 + b.x, w.y + 36 + b.y, b.width, b.height, 2);
       push();
       noStroke();
-      fill(200, 200, 255);
+      fill(color('rgba(210, 210, 210, .9)'));
       textAlign(CENTER);
       textFont('monospace');
-      textSize(20);
-      text(b.text, w.x + b.x + b.width / 2, w.y + 40 + b.y);
+      textSize(16);
+      text(b.text, w.x + b.x + b.width / 2, w.y + 42 + b.y);
       pop();
     });
   });
