@@ -1,5 +1,7 @@
 let windowArray;
 
+let isMouseClicked = false;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   
@@ -35,7 +37,13 @@ function setup() {
       title: 'Random Cat Facts',
       emojiIcon: '😼',
       content: 'Use "Get" button to get new fact'
-    })
+    }),
+    new AppWindow({
+      x: random(windowWidth - 400), y: random(windowHeight - 440),
+      width: 400, height: 440,
+      title: 'Dummy Paint',
+      emojiIcon: '🎨',
+    }),
   ];
    windowArray[1].addImage(`https://yinkar.github.io/pixelart/images/01-gariban-kedi.png`, 0, 0, 292, 290);
   
@@ -101,6 +109,25 @@ y='14'%3E${(
   });
    windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E🚀%3C/text%3E%3C/svg%3E`, 40, 20, 40, 40);
   
+  windowArray[5].addCanvas(0, 0, 392, 400, (c, w) => {
+    c.background(255);
+  }, (c, w) => {
+    if (isMouseClicked && w.zIndex === windowArray.length - 1) {
+      c.fill(0);
+      c.noStroke();
+      c.circle(mouseX - w.x - 4, mouseY - w.y - 26, 5);
+      c.stroke(0);
+      c.strokeWeight(5);
+      c.strokeCap(ROUND);
+      c.line(
+        pmouseX - w.x - 4, 
+        pmouseY - w.y - 26, 
+        mouseX - w.x - 4, 
+        mouseY - w.y - 26
+      );
+    }
+  });
+  
   windowArray.forEach((w, i) => {
     w.zIndex = i;
     if (![null, undefined, ''].includes(w.iconUrl)) {
@@ -109,6 +136,12 @@ y='14'%3E${(
     
     w.images.forEach(e => {
       e.image = loadImage(e.url);
+    });
+    
+    w.canvases.forEach(c => {
+      c.canvas = createGraphics(w.width, w.height);
+      
+      c.startHandler(c.canvas, w);
     });
   });
   
@@ -268,6 +301,12 @@ function draw() {
       text(b.text, w.x + b.x + b.width / 2, w.y + 42 + b.y);
       pop();
     });
+    
+    w.canvases.forEach(c => {
+      c.drawHandler(c.canvas, w);
+      
+      image(c.canvas,  w.x + 4 + c.x, w.y + 36 + c.y, c.width, c.height);
+    });
   });
   
   windowArray.forEach(w => {
@@ -279,6 +318,8 @@ function draw() {
 }
 
 function mousePressed() {
+  isMouseClicked = true;
+  
   if (windowArray.find(e => e.grabbed)) return;
   
   windowArray.forEach((w, i) => {
@@ -347,6 +388,8 @@ function mousePressed() {
 }
 
 function mouseReleased() {
+  isMouseClicked = false;
+  
   windowArray.forEach((w, i) => {
     w.grabbed = false;
     

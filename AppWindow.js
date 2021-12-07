@@ -57,6 +57,8 @@ class AppWindow {
     this.images = [];
     
     this.buttons = [];
+    
+    this.canvases = [];
   }
   
   emojiToIcon(emoji) {
@@ -89,4 +91,15 @@ class AppWindow {
     });
   }
   
+  addCanvas(x, y, width, height, startHandler, drawHandler) {
+    this.canvases.push({
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      startHandler: startHandler,
+      drawHandler: drawHandler
+    });
+  }
+    
 }
