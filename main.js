@@ -395,7 +395,19 @@ function mouseReleased() {
       mouseX > w.x + w.width - 2 - 25 &&
       mouseY > w.y + 6 &&
       mouseX < w.x + w.width - 2 - 25 + 20 &&
-      mouseY < w.y + 6 + 20
+      mouseY < w.y + 6 + 20 &&
+      ![
+        ...windowArray.slice(0, windowArray.indexOf(w)), 
+        ...windowArray.slice(windowArray.indexOf(w) + 1)
+      ].some(e => {
+        return (
+          mouseX > e.x &&
+          mouseY > e.y &&
+          mouseX < e.x + e.width &&
+          mouseY < e.y + e.height &&
+          e.zIndex > w.zIndex
+        )
+      })
     ) {
       windowArray.splice(i, 1);
       windowArray.forEach((e, i) => e.zIndex = i);
