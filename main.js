@@ -1,7 +1,5 @@
 let windowArray;
 
-let isMouseClicked = false;
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   
@@ -112,7 +110,7 @@ y='14'%3E${(
   windowArray[5].addCanvas(0, 0, 392, 400, (c, w) => {
     c.background(255);
   }, (c, w) => {
-    if (isMouseClicked && w.zIndex === windowArray.length - 1) {
+    if (mouseIsPressed && w.zIndex === windowArray.length - 1 && mouseButton === LEFT) {
       c.fill(0);
       c.noStroke();
       c.circle(mouseX - w.x - 4, mouseY - w.y - 26, 5);
@@ -318,8 +316,6 @@ function draw() {
 }
 
 function mousePressed() {
-  isMouseClicked = true;
-  
   if (windowArray.find(e => e.grabbed)) return;
   
   windowArray.forEach((w, i) => {
@@ -387,9 +383,7 @@ function mousePressed() {
   });
 }
 
-function mouseReleased() {
-  isMouseClicked = false;
-  
+function mouseReleased() {  
   windowArray.forEach((w, i) => {
     w.grabbed = false;
     
