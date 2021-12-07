@@ -110,7 +110,7 @@ y='14'%3E${(
   windowArray[5].addCanvas(0, 0, 392, 400, (c, w) => {
     c.background(255);
   }, (c, w) => {
-    if (mouseIsPressed && w.zIndex === windowArray.length - 1) {
+    if (mouseIsPressed && w.zIndex === windowArray.length - 1 && !w.grabbed) {
       
       if (mouseButton === LEFT) {
         c.stroke(0);
