@@ -110,18 +110,22 @@ y='14'%3E${(
   windowArray[5].addCanvas(0, 0, 392, 400, (c, w) => {
     c.background(255);
   }, (c, w) => {
-    if (mouseIsPressed && w.zIndex === windowArray.length - 1 && mouseButton === LEFT) {
-      c.fill(0);
-      c.noStroke();
-      c.circle(mouseX - w.x - 4, mouseY - w.y - 26, 5);
-      c.stroke(0);
-      c.strokeWeight(5);
+    if (mouseIsPressed && w.zIndex === windowArray.length - 1) {
+      
+      if (mouseButton === LEFT) {
+        c.stroke(0);
+        c.strokeWeight(5);
+      }
+      else if (mouseButton === RIGHT) {
+        c.stroke(255);
+        c.strokeWeight(20);
+      }
       c.strokeCap(ROUND);
       c.line(
         pmouseX - w.x - 4, 
-        pmouseY - w.y - 26, 
+        pmouseY - w.y - 22, 
         mouseX - w.x - 4, 
-        mouseY - w.y - 26
+        mouseY - w.y - 22
       );
     }
   });
