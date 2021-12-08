@@ -48,7 +48,8 @@ class AppWindow {
             bg: 'rgb(220, 70, 70)',
             fg: 'rgb(255, 255, 255)'
           }
-        }
+        },
+        clicked: false
       }
     }
     
@@ -91,15 +92,15 @@ class AppWindow {
     });
   }
   
-  addCanvas(x, y, width, height, startHandler, drawHandler) {
+  addCanvas(x, y, width, height, startHandler, drawHandler, isWebGl) {
     this.canvases.push({
       x: x,
       y: y,
       width: width,
       height: height,
       startHandler: startHandler,
-      drawHandler: drawHandler
+      drawHandler: drawHandler,
+      isWebGl: isWebGl
     });
   }
-    
 }

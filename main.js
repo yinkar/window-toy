@@ -1,14 +1,23 @@
 let windowArray;
 
+let teapotModel;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  
+  teapotModel = loadModel('teapot.obj');
+  
+  for (let el of document.getElementsByClassName('p5Canvas')) {
+    el.addEventListener('contextmenu', e => e.preventDefault());
+  }
   
   windowArray = [
     new AppWindow({
       x: random(windowWidth - 300), y: random(windowHeight - 220), 
       width: 300, height: 220, 
-      title: 'Random Cat Photo',
-      emojiIcon: '🐱‍🏍'
+      title: 'Random Cat Photos',
+      emojiIcon: '🐱‍🏍',
+      content: 'Use the button below to get a new photo'
     }),
     new AppWindow({
       x: random(windowWidth - 300), y: random(windowHeight - 330), 
@@ -34,13 +43,19 @@ function setup() {
       width: 500, height: 160,
       title: 'Random Cat Facts',
       emojiIcon: '😼',
-      content: 'Use "Get" button to get new fact'
+      content: 'Use the button below to get a new fact'
     }),
     new AppWindow({
       x: random(windowWidth - 400), y: random(windowHeight - 440),
       width: 400, height: 440,
       title: 'Dummy Paint',
       emojiIcon: '🎨',
+    }),
+    new AppWindow({
+      x: random(windowWidth - 200), y: random(windowHeight - 240),
+      width: 200, height: 200,
+      title: '3D Renderer',
+      emojiIcon: '📦'
     }),
   ];
    windowArray[1].addImage(`https://yinkar.github.io/pixelart/images/01-gariban-kedi.png`, 0, 0, 292, 290);
@@ -96,7 +111,7 @@ y='14'%3E${(
     fetch('https://meowfacts.herokuapp.com/')
       .then(r => r.json())
       .then(d => {
-        let croppedData = d.data.toString().substring(0, 200).trim();
+        let croppedData = d.data.toString().substring(0, 300).trim();
             
         if (croppedData.length < d.data.toString().length) {
           croppedData = `${croppedData}...`;
@@ -111,7 +126,6 @@ y='14'%3E${(
     c.background(255);
   }, (c, w) => {
     if (mouseIsPressed && w.zIndex === windowArray.length - 1 && !w.grabbed) {
-      
       if (mouseButton === LEFT) {
         c.stroke(0);
         c.strokeWeight(5);
@@ -123,12 +137,29 @@ y='14'%3E${(
       c.strokeCap(ROUND);
       c.line(
         pmouseX - w.x - 4, 
-        pmouseY - w.y - 22, 
+        pmouseY - w.y - 36, 
         mouseX - w.x - 4, 
-        mouseY - w.y - 22
+        mouseY - w.y - 36
       );
     }
   });
+  
+  windowArray[6].addCanvas(0, 0, 192, 160, (c, w) => {
+    c.background(10);
+  }, (c, w) => {
+    c.background(10);
+
+    c.normalMaterial();
+    
+    c.push();
+    c.translate(0, 60, -10);
+    c.rotateZ(PI * 3);
+    c.rotateY(frameCount / 75);
+    c.scale(24);
+    c.model(teapotModel);
+    c.pop();
+    
+  }, true);
   
   windowArray.forEach((w, i) => {
     w.zIndex = i;
@@ -141,7 +172,12 @@ y='14'%3E${(
     });
     
     w.canvases.forEach(c => {
-      c.canvas = createGraphics(w.width, w.height);
+      if (c.isWebGl) {
+        c.canvas = createGraphics(c.width, c.height, WEBGL);
+      }
+      else {
+        c.canvas = createGraphics(c.width, c.height);
+      }
       
       c.startHandler(c.canvas, w);
     });
@@ -163,6 +199,11 @@ function draw() {
     drawingContext.shadowBlur = 10;
     drawingContext.shadowColor = 'rgba(0, 0, 0, 0.9)';
     stroke(color('rgba(255, 255, 255, .15)'));
+    
+    if (w.zIndex !== windowArray.length - 1) {
+      stroke(color('rgba(255, 255, 255, .1)'));
+    }
+    
     fill(color('rgba(0, 0, 0, .5)'));
     rect(w.x, w.y, w.width, w.height, 2);
     pop();
@@ -177,19 +218,19 @@ function draw() {
     rect(w.x + 2, w.y + 2, w.width - 4, 32 - 2, 2);
 
     if (![null, undefined, ''].includes(w.icon)) {
-      image(w.icon, w.x + 8, w.y + 9, 16, 16);
+      image(w.icon, w.x + 8, w.y + 10, 16, 16);
     }
     else {
       stroke(120, 120, 120);
       fill(200, 200, 200);
-      circle(w.x + 8, w.y + 9, 16);
+      circle(w.x + 8, w.y + 11, 16);
     }
 
     noStroke();
     fill(color('rgba(200, 200, 200, 1)'));
-    textFont('monospace');
-    textSize(18);
-    text(w.title, w.x + 30, w.y + 9);
+    textFont('Inter');
+    textSize(14);
+    text(w.title, w.x + 30, w.y + 11);
     
     let closeButtonColor = w.titleButtons.closeButton.color.normal;
     
@@ -221,14 +262,14 @@ function draw() {
 
     noStroke();
     fill(color(closeButtonColor.bg));
-    rect(w.x + w.width - 2 - 25, w.y + 6, 20, 20, 3);
+    rect(w.x + w.width - 2 - 25, w.y + 7, 20, 20, 3);
     
     push();
     strokeWeight(3);
     stroke(color(closeButtonColor.fg));
     strokeCap(ROUND);
-    line(w.x + w.width - 2 - 18, w.y + 13, w.x + w.width - 2 - 12, w.y + 19);
-    line(w.x + w.width - 2 - 12, w.y + 13, w.x + w.width - 2 - 18, w.y + 19);
+    line(w.x + w.width - 2 - 18, w.y + 14, w.x + w.width - 2 - 12, w.y + 20);
+    line(w.x + w.width - 2 - 12, w.y + 14, w.x + w.width - 2 - 18, w.y + 20);
     pop();
     
     stroke('rgba(255, 255, 255, .1)');
@@ -236,11 +277,11 @@ function draw() {
     rect(w.x + 4, w.y + 36, w.width - 8, w.height - 8 - 32, 2);
     
     if (![null, undefined, ''].includes(w.content)) {      
-      textSize(14);
-      textFont('monospace');
+      textSize(13);
+      textFont('Inter');
       noStroke();
       fill(240);
-      text(w.content, w.x + 12, w.y + 44, w.width - 8, w.height);
+      text(w.content, w.x + 12, w.y + 44, w.width - 18, w.height);
     }
     
     w.images.forEach(e => {
@@ -293,13 +334,13 @@ function draw() {
       ) {
         fill(color('rgba(70, 70, 70, .9)'));
       }
-      rect(w.x + 4 + b.x, w.y + 36 + b.y, b.width, b.height, 2);
+      rect(w.x + 4 + b.x, w.y + 35 + b.y, b.width, b.height, 2);
       push();
       noStroke();
       fill(color('rgba(210, 210, 210, .9)'));
       textAlign(CENTER);
-      textFont('monospace');
-      textSize(16);
+      textFont('Inter');
+      textSize(13);
       text(b.text, w.x + b.x + b.width / 2, w.y + 42 + b.y);
       pop();
     });
@@ -358,7 +399,7 @@ function mousePressed() {
         mouseX > w.x + 2 &&
         mouseY > w.y + 2 &&
         mouseX < w.x + w.width - 4 &&
-        mouseY < w.y + 32 - 4
+        mouseY < w.y + 32 - 2
       ) {
           w.grabbed = true;
           w.clickedPoint = {
@@ -378,24 +419,12 @@ function mousePressed() {
       windowArray.forEach(e => e.isOnTop = false);
       w.isOnTop = true;
     }
-  });
-  
-  windowArray.sort((a, b) => {
-    if (a.zIndex < b.zIndex) return -1; 
-    if (a.zIndex > b.zIndex) return 1; 
-    return 0;
-  });
-}
 
-function mouseReleased() {  
-  windowArray.forEach((w, i) => {
-    w.grabbed = false;
-    
     if (
       mouseX > w.x + w.width - 2 - 25 &&
-      mouseY > w.y + 6 &&
+      mouseY > w.y + 7 &&
       mouseX < w.x + w.width - 2 - 25 + 20 &&
-      mouseY < w.y + 6 + 20 &&
+      mouseY < w.y + 7 + 20 &&
       ![
         ...windowArray.slice(0, windowArray.indexOf(w)), 
         ...windowArray.slice(windowArray.indexOf(w) + 1)
@@ -408,6 +437,40 @@ function mouseReleased() {
           e.zIndex > w.zIndex
         )
       })
+    ) {
+      w.titleButtons.closeButton.clicked = true;
+    }
+  });
+  
+  windowArray.sort((a, b) => {
+    if (a.zIndex < b.zIndex) return -1; 
+    if (a.zIndex > b.zIndex) return 1; 
+    return 0;
+  });
+}
+
+function mouseReleased() {
+  windowArray.forEach((w, i) => {
+    w.grabbed = false;
+
+    if (
+      mouseX > w.x + w.width - 2 - 25 &&
+      mouseY > w.y + 7 &&
+      mouseX < w.x + w.width - 2 - 25 + 20 &&
+      mouseY < w.y + 7 + 20 &&
+      ![
+        ...windowArray.slice(0, windowArray.indexOf(w)), 
+        ...windowArray.slice(windowArray.indexOf(w) + 1)
+      ].some(e => {
+        return (
+          mouseX > e.x &&
+          mouseY > e.y &&
+          mouseX < e.x + e.width &&
+          mouseY < e.y + e.height &&
+          e.zIndex > w.zIndex
+        )
+      }) &&
+      w.titleButtons.closeButton.clicked
     ) {
       windowArray.splice(i, 1);
       windowArray.forEach((e, i) => e.zIndex = i);
@@ -431,6 +494,8 @@ function mouseReleased() {
         b.action(w);
       }
     });
+  
+    w.titleButtons.closeButton.clicked = false;
   });
 }
 
