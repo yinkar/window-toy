@@ -1,11 +1,9 @@
 let windowArray;
 
-let teapotModel;
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  
-  teapotModel = loadModel('teapot.obj');
+
+  cursor('https://raw.githubusercontent.com/keeferrourke/capitaine-cursors/master/src/svg/dark/default.svg');
   
   for (let el of document.getElementsByClassName('p5Canvas')) {
     el.addEventListener('contextmenu', e => e.preventDefault());
@@ -57,13 +55,20 @@ function setup() {
       title: '3D Renderer',
       emojiIcon: '📦'
     }),
+    new AppWindow({
+      x: random(windowWidth - 200), y: random(windowHeight - 150),
+      width: 200, height: 110,
+      title: 'Stopwatch',
+      emojiIcon: '⌚'
+    }),
   ];
-   windowArray[1].addImage(`https://yinkar.github.io/pixelart/images/01-gariban-kedi.png`, 0, 0, 292, 290);
+  
+  windowArray[1].addImage(`https://yinkar.github.io/pixelart/images/01-gariban-kedi.png`, 0, 0, 292, 290);
   
   windowArray[3].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E💣️%3C/text%3E%3C/svg%3E`, 60, 20, 140, 140);
   
   windowArray[1].addButton(`Test`, 100, 240, 100, 25, (w) => {       
-    const emojis = [...'🚗🚲🛴🚿🌒🌡☄🔥'];
+    const emojis = [...'🚗🚲🛴🚿🌒🍟🌭🍠🍗🌯🍭🥕🥜🍄🧤🧣🎰🎸🎱🏀🏐🥎🏒🏈🔓🔥'];
        w.addImage(`data:image/svg+xml,\
 %3Csvg%20xmlns='http://www\
 .w3.org/2000/svg'%20viewBox='0%200%\
@@ -78,7 +83,6 @@ y='14'%3E${(
         ...Array(2).fill(random(20, 40))
        );
     
-    
     w.images.at(-1).image = loadImage(w.images.at(-1).url);
     
     w.title = w.title.replace(
@@ -86,7 +90,6 @@ y='14'%3E${(
       ''
     ) + ' ' + str(w.images.length - 1);
   });
-  
   
   windowArray[0].addButton(`Get New Photo`, 60, 145, 180, 25, (w) => {
     w.content = 'Loading...';
@@ -120,7 +123,7 @@ y='14'%3E${(
         w.content = croppedData;
       });
   });
-   windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E🚀%3C/text%3E%3C/svg%3E`, 40, 20, 40, 40);
+  windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E🚀%3C/text%3E%3C/svg%3E`, 40, 20, 40, 40);
   
   windowArray[5].addCanvas(0, 0, 392, 400, (c, w) => {
     c.background(255);
@@ -135,6 +138,7 @@ y='14'%3E${(
         c.strokeWeight(20);
       }
       c.strokeCap(ROUND);
+      c.strokeJoin(ROUND);
       c.line(
         pmouseX - w.x - 4, 
         pmouseY - w.y - 36, 
@@ -145,6 +149,8 @@ y='14'%3E${(
   });
   
   windowArray[6].addCanvas(0, 0, 192, 160, (c, w) => {
+    w.vars.teapotModel = loadModel('teapot.obj');
+
     c.background(10);
   }, (c, w) => {
     c.background(10);
@@ -154,12 +160,37 @@ y='14'%3E${(
     c.push();
     c.translate(0, 60, -10);
     c.rotateZ(PI * 3);
-    c.rotateY(frameCount / 75);
+    c.rotateY(frameCount / 50);
     c.scale(24);
-    c.model(teapotModel);
+    c.model(w.vars.teapotModel);
     c.pop();
     
   }, true);
+
+  windowArray[7].addCanvas(0, 0, 192, 70, (c, w) => {
+    w.vars.counts = 0;
+    w.vars.mouseClicked = false;
+    w.vars.start = false;
+
+  }, (c, w) => {
+    c.background(30);
+    
+    c.textSize(30);
+    c.fill(255);
+    c.textFont('monospace');
+    c.textAlign(CENTER);
+    c.text(w.vars.counts, 25, 20, 150, 50);
+
+    if (w.vars.start) {
+      w.vars.counts++;
+    }
+
+    if (w.vars.mouseClicked !== mouseIsPressed) {
+      w.vars.start = !w.vars.start;
+    }
+
+    w.vars.mouseClicked = mouseIsPressed;
+  })
   
   windowArray.forEach((w, i) => {
     w.zIndex = i;

@@ -60,6 +60,15 @@ class AppWindow {
     this.buttons = [];
     
     this.canvases = [];
+
+    this.sideClicks = {
+      up: false,
+      right: false,
+      down: false,
+      left: false
+    };
+
+    this.vars = {};
   }
   
   emojiToIcon(emoji) {
