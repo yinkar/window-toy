@@ -46,6 +46,10 @@ class AppWindow {
           },
           hover: {
             bg: 'rgb(220, 70, 70)',
+            fg: 'rgb(255, 230, 230)'
+          },
+          active: {
+            bg: 'rgb(220, 90, 90)',
             fg: 'rgb(255, 255, 255)'
           }
         },
@@ -59,6 +63,23 @@ class AppWindow {
     this.buttons = [];
     this.canvases = [];
     this.vars = {};
+
+    this.sideClicks = {
+      up: false,
+      right: false,
+      down: false,
+      left: false,
+      upRight: false,
+      upDown: false,
+      downRight: false,
+      downLeft: false
+    };
+
+    this.initialDimensions = {
+      width: this.width,
+      height: this.height
+    };
+    
   }
   
   emojiToIcon(emoji) {
@@ -91,7 +112,17 @@ class AppWindow {
     });
   }
   
-  addCanvas(x, y, width, height, startHandler, drawHandler, isWebGl) {
+  addCanvas(
+    x, 
+    y, 
+    width, 
+    height, 
+    startHandler, 
+    drawHandler, 
+    isWebGl, 
+    clickHandler,
+    resizeHandler
+  ) {
     this.canvases.push({
       x: x,
       y: y,
@@ -99,7 +130,9 @@ class AppWindow {
       height: height,
       startHandler: startHandler,
       drawHandler: drawHandler,
-      isWebGl: isWebGl
+      isWebGl: isWebGl,
+      clickHandler: clickHandler,
+      resizeHandler: resizeHandler
     });
   }
 }

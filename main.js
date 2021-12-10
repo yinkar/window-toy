@@ -65,8 +65,8 @@ function setup() {
       icons.at(
         int(random(0, icons.length))
       ).toString(), 
-      random(0, w.width - 45), 
-      random(90, w.height) - 90, 
+      random(0, 300 - 45), 
+      random(90, 330) - 90, 
       ...Array(2).fill(random(20, 40))
     );
   
@@ -120,7 +120,7 @@ function setup() {
   windowArray.at(-1).addCanvas(0, 0, 392, 400, (c, w) => {
     c.background(255);
   }, (c, w) => {
-    if (mouseIsPressed && w.zIndex === windowArray.length - 1 && !w.grabbed) {
+    if (mouseIsPressed && w.zIndex === windowArray.length - 1 && !w.grabbed && !Object.values(w.sideClicks).some(e => e)) {
       if (mouseButton === LEFT) {
         c.stroke(0);
         c.strokeWeight(5);
@@ -147,7 +147,7 @@ function setup() {
     iconUrl: 'icons/cube.png',
   }));
   windowArray.at(-1).addCanvas(0, 0, 192, 160, (c, w) => {
-    w.vars.teapotModel = loadModel('teapot.obj');
+    w.vars.model = loadModel('teapot.obj');
 
     c.background(10);
   }, (c, w) => {
@@ -160,13 +160,16 @@ function setup() {
     c.rotateZ(PI * 3);
     c.rotateY(frameCount / 75);
     c.scale(24);
-    c.model(w.vars.teapotModel);
+    c.model(w.vars.model);
     c.pop();
     
-  }, true);
+  }, true, () => {}, resizeHandler = (c, w) => {
+    w.canvases.at(0).width = w.width - 8;
+    w.canvases.at(0).height = w.height - 40;
+    c.resizeCanvas(w.canvases.at(0).width, w.canvases.at(0).height);
+  });
 
-  
-  
+
   
   windowArray.forEach((w, i) => {
     w.zIndex = i;
@@ -194,6 +197,8 @@ function setup() {
 }
 
 function draw() {
+  cursor('https://raw.githubusercontent.com/keeferrourke/capitaine-cursors/master/src/svg/dark/default.svg');
+
   background(35);
   
   textAlign(LEFT, TOP);
@@ -265,6 +270,198 @@ function draw() {
       )
     ) {
       closeButtonColor = w.titleButtons.closeButton.color.hover;
+    }
+
+    const whenResize = (w) => {
+      w.canvases.forEach(c => {
+        if (c.resizeHandler !== undefined) {
+          c.resizeHandler(c.canvas, w);
+        }
+      });
+    }
+
+    // Refactoring needed
+    
+    if (w.sideClicks.left) {
+      if (mouseX + w.initialDimensions.width < w.x + w.width) {
+        w.width += (w.x - mouseX);
+        w.x = mouseX;
+        whenResize(w);
+      }
+    }
+    
+    if (w.sideClicks.right) {
+      if (mouseX - w.initialDimensions.width > w.x) {
+        w.width = mouseX - w.x;
+        whenResize(w);
+      }
+    }
+    
+    if (w.sideClicks.down) {
+      if (mouseY - w.initialDimensions.height > w.y) {
+        w.height = mouseY - w.y;
+        whenResize(w);
+      }
+    }
+    
+    if (w.sideClicks.up) {
+      if (mouseY + w.initialDimensions.height < w.y + w.height) {
+        w.height += (w.y - mouseY);
+        w.y = mouseY;
+        whenResize(w);
+      }
+    }
+    
+    if (w.sideClicks.upLeft) {
+      if (
+        mouseY + w.initialDimensions.height < w.y + w.height && 
+        mouseX + w.initialDimensions.width < w.x + w.width
+      ) {
+        w.height += (w.y - mouseY);
+        w.y = mouseY;
+        w.width += (w.x - mouseX);
+        w.x = mouseX;
+        whenResize(w);
+      }
+    }
+    
+    if (w.sideClicks.upRight) {
+      if (
+        mouseY + w.initialDimensions.height < w.y + w.height &&
+        mouseX - w.initialDimensions.width > w.x
+      ) {
+        w.height += (w.y - mouseY);
+        w.y = mouseY;
+        w.width = mouseX - w.x;
+        whenResize(w);
+      }
+    }
+    
+    if (w.sideClicks.downLeft) {
+      if (
+        mouseY - w.initialDimensions.height > w.y &&
+        mouseX + w.initialDimensions.width < w.x + w.width
+      ) {
+        w.height = mouseY - w.y;
+        w.width += (w.x - mouseX);
+        w.x = mouseX;
+        whenResize(w);
+      }
+    }
+    
+    if (w.sideClicks.downRight) {
+      if (
+        mouseY - w.initialDimensions.height > w.y &&
+        mouseX - w.initialDimensions.width > w.x
+      ) {
+        w.height = mouseY - w.y;
+        w.width = mouseX - w.x;
+        whenResize(w);
+      }
+    }
+    
+    if (
+      (w.zIndex === windowArray.length - 1) ||
+      (
+        ![
+          ...windowArray.slice(0, windowArray.indexOf(w)), 
+          ...windowArray.slice(windowArray.indexOf(w) + 1)
+        ].some(e => {
+          return (
+            mouseX > e.x &&
+            mouseY > e.y &&
+            mouseX < e.x + e.width &&
+            mouseY < e.y + e.height &&
+            e.zIndex > w.zIndex
+          )
+        })
+      )
+    ) {
+
+      // Left
+      if (
+        mouseX > w.x - 0 &&
+        mouseX < w.x + 5 &&
+        mouseY > w.y + 0 &&
+        mouseY < w.y + 0 + w.height
+      ) {
+        cursor('ew-resize');
+      }
+
+      // Right
+      if (
+        mouseX > w.x - 5 + w.width &&
+        mouseX < w.x + 0 + w.width &&
+        mouseY > w.y + 0 &&
+        mouseY < w.y + 0 + w.height
+      ) {
+        cursor('ew-resize');
+      }
+
+      // Down
+      if (
+        mouseY > w.y - 5 + w.height &&
+        mouseY < w.y + 0 + w.height &&
+        mouseX > w.x + 0 &&
+        mouseX < w.x + 0 + w.width
+      ) {
+        cursor('ns-resize');
+      }
+
+      // Up
+      if (
+        mouseY > w.y - 5 &&
+        mouseY < w.y + 0 &&
+        mouseX > w.x + 0 &&
+        mouseX < w.x + 0 + w.width
+      ) {
+        cursor('ns-resize');
+      }
+
+      // Down Left
+      if (
+        mouseX > w.x - 0 &&
+        mouseX < w.x + 5 &&
+        mouseY > w.y - 5 + w.height &&
+        mouseY < w.y + 0 + w.height
+      ) {
+        cursor('nesw-resize');
+      }
+
+      // Down Right
+      if (
+        mouseX > w.x - 5 + w.width &&
+        mouseX < w.x + 0 + w.width &&
+        mouseY > w.y - 5 + w.height &&
+        mouseY < w.y + 0 + w.height
+      ) {
+        cursor('nwse-resize');
+      }
+
+      // Up Left
+      if (
+        mouseX > w.x - 0 &&
+        mouseX < w.x + 5 &&
+        mouseY > w.y - 0 &&
+        mouseY < w.y + 5
+      ) {
+        cursor('nwse-resize');
+      }
+
+      // Up Right
+      if (
+        mouseX > w.x - 5 + w.width &&
+        mouseX < w.x + 0 + w.width &&
+        mouseY > w.y - 0 &&
+        mouseY < w.y + 5
+      ) {
+        cursor('nesw-resize');
+      }
+    }
+
+
+    if (w.titleButtons.closeButton.clicked) {
+      closeButtonColor = w.titleButtons.closeButton.color.active;
     }
 
     noStroke();
@@ -357,6 +554,8 @@ function draw() {
       
       image(c.canvas,  w.x + 4 + c.x, w.y + 36 + c.y, c.width, c.height);
     });
+
+
   });
   
   windowArray.forEach(w => {
@@ -373,10 +572,10 @@ function mousePressed() {
   windowArray.forEach((w, i) => {
     if (
       (
-        mouseX > w.x &&
-        mouseY > w.y &&
-        mouseX < w.x + w.width &&
-        mouseY < w.y + w.height
+        mouseX > w.x - 4 &&
+        mouseY > w.y - 4 &&
+        mouseX < w.x + w.width + 4 &&
+        mouseY < w.y + w.height + 4
       ) &&
       !(
         mouseX > w.x + w.width - 2 - 25 &&
@@ -408,13 +607,113 @@ function mousePressed() {
         mouseX < w.x + w.width - 4 &&
         mouseY < w.y + 32 - 2
       ) {
-          w.grabbed = true;
-          w.clickedPoint = {
-            x: mouseX - w.x,
-            y: mouseY - w.y
-          }
+        w.grabbed = true;
+        w.clickedPoint = {
+          x: mouseX - w.x,
+          y: mouseY - w.y
         }
-      
+      }
+
+      if (
+        (w.zIndex === windowArray.length - 1) ||
+        (
+          ![
+            ...windowArray.slice(0, windowArray.indexOf(w)), 
+            ...windowArray.slice(windowArray.indexOf(w) + 1)
+          ].some(e => {
+            return (
+              mouseX > e.x &&
+              mouseY > e.y &&
+              mouseX < e.x + e.width &&
+              mouseY < e.y + e.height &&
+              e.zIndex > w.zIndex
+            )
+          })
+        )
+      ) {
+  
+        // Left
+        if (
+          mouseX > w.x - 2 &&
+          mouseX < w.x + 3 &&
+          mouseY > w.y + 2 &&
+          mouseY < w.y + 2 + w.height
+        ) {
+          w.sideClicks.left = true;
+        }
+  
+        // Right
+        if (
+          mouseX > w.x - 3 + w.width &&
+          mouseX < w.x + 2 + w.width &&
+          mouseY > w.y + 2 &&
+          mouseY < w.y + 2 + w.height
+        ) {
+          w.sideClicks.right = true;
+        }
+  
+        // Down
+        if (
+          mouseY > w.y - 3 + w.height &&
+          mouseY < w.y + 2 + w.height &&
+          mouseX > w.x + 2 &&
+          mouseX < w.x + 2 + w.width
+        ) {
+          w.sideClicks.down = true;
+        }
+  
+        // Up
+        if (
+          mouseY > w.y - 3 &&
+          mouseY < w.y + 2 &&
+          mouseX > w.x + 2 &&
+          mouseX < w.x + 2 + w.width
+        ) {
+          w.sideClicks.up = true;
+        }
+  
+        // Down Left
+        if (
+          mouseX > w.x - 4 &&
+          mouseX < w.x + 5 &&
+          mouseY > w.y - 5 + w.height &&
+          mouseY < w.y + 4 + w.height
+        ) {
+          w.sideClicks.downLeft = true;
+        }
+  
+        // Down Right
+        if (
+          mouseX > w.x - 5 + w.width &&
+          mouseX < w.x + 4 + w.width &&
+          mouseY > w.y - 5 + w.height &&
+          mouseY < w.y + 4 + w.height
+        ) {
+          w.sideClicks.downRight = true;
+        }
+  
+        // Up Left
+        if (
+          mouseX > w.x - 4 &&
+          mouseX < w.x + 5 &&
+          mouseY > w.y - 4 &&
+          mouseY < w.y + 5
+        ) {
+          w.sideClicks.upLeft = true;
+        }
+  
+        // Up Right
+        if (
+          mouseX > w.x - 5 + w.width &&
+          mouseX < w.x + 4 + w.width &&
+          mouseY > w.y - 4 &&
+          mouseY < w.y + 5
+        ) {
+          w.sideClicks.upRight = true;
+        }
+      }
+  
+    
       let maxZIndex = windowArray.length - 1;
             
       windowArray.filter(e => e.zIndex > w.zIndex).forEach(e => {
@@ -425,6 +724,19 @@ function mousePressed() {
       
       windowArray.forEach(e => e.isOnTop = false);
       w.isOnTop = true;
+
+      w.canvases.forEach(c => {
+        if (c.clickHandler !== undefined) {
+          if (
+            mouseX > w.x + c.x + 2 &&
+            mouseX < w.x + c.x + c.width + 2 &&
+            mouseY > w.y + c.y + 32 + 2 &&
+            mouseY < w.y + c.y + c.height + 32 + 2
+          ) {          
+            c.clickHandler(c.canvas, w);
+          }
+        }
+      });
     }
 
     if (
@@ -459,6 +771,17 @@ function mousePressed() {
 function mouseReleased() {
   windowArray.forEach((w, i) => {
     w.grabbed = false;
+
+    w.sideClicks = {
+      up: false,
+      right: false,
+      down: false,
+      left: false,
+      upLeft: false,
+      upRight: false,
+      downLeft: false,
+      downRight: false
+    };
 
     if (
       mouseX > w.x + w.width - 2 - 25 &&
