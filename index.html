@@ -15,7 +15,6 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-            tap-highlight-color: transparent;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
@@ -53,7 +52,9 @@
     <script src="main.js"></script>
     
     <script>
-      document.body.classList.add('render');
+      document.addEventListener('DOMContentLoaded', () => {
+        document.body.classList.add('render');
+      });
     </script>
   </body>
 </html>

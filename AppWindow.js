@@ -56,10 +56,9 @@ class AppWindow {
     this.isOnTop = false;
     
     this.images = [];
-    
     this.buttons = [];
-    
     this.canvases = [];
+    this.vars = {};
   }
   
   emojiToIcon(emoji) {

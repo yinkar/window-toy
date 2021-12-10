@@ -1,94 +1,22 @@
-let windowArray;
-
-let teapotModel;
+let windowArray = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  
-  teapotModel = loadModel('teapot.obj');
   
   for (let el of document.getElementsByClassName('p5Canvas')) {
     el.addEventListener('contextmenu', e => e.preventDefault());
   }
   
-  windowArray = [
-    new AppWindow({
-      x: random(windowWidth - 300), y: random(windowHeight - 220), 
-      width: 300, height: 220, 
-      title: 'Random Cat Photos',
-      emojiIcon: '🐱‍🏍',
-      content: 'Use the button below to get a new photo'
-    }),
-    new AppWindow({
-      x: random(windowWidth - 300), y: random(windowHeight - 330), 
-      width: 300, height: 330, 
-      title: 'Gariban Kedi',
-      emojiIcon: '🐈️'
-    }),
-    new AppWindow({
-      x: random(windowWidth - 280), y: random(windowHeight - 105), 
-      width: 280, height: 105, 
-      title: 'Denek',
-      emojiIcon: '👾',
-      content: 'Zaman yolcusu kalmasın'
-    }),
-    new AppWindow({
-      x: random(windowWidth - 300), y: random(windowHeight - 200), 
-      width: 300, height: 200, 
-      title: 'Tost Makinesi',
-      emojiIcon: '🐱‍👤'
-    }),
-    new AppWindow({
-      x: random(windowWidth - 500), y: random(windowHeight - 160),
-      width: 500, height: 160,
-      title: 'Random Cat Facts',
-      emojiIcon: '😼',
-      content: 'Use the button below to get a new fact'
-    }),
-    new AppWindow({
-      x: random(windowWidth - 400), y: random(windowHeight - 440),
-      width: 400, height: 440,
-      title: 'Dummy Paint',
-      emojiIcon: '🎨',
-    }),
-    new AppWindow({
-      x: random(windowWidth - 200), y: random(windowHeight - 240),
-      width: 200, height: 200,
-      title: '3D Renderer',
-      emojiIcon: '📦'
-    }),
-  ];
-   windowArray[1].addImage(`https://yinkar.github.io/pixelart/images/01-gariban-kedi.png`, 0, 0, 292, 290);
-  
-  windowArray[3].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E💣️%3C/text%3E%3C/svg%3E`, 60, 20, 140, 140);
-  
-  windowArray[1].addButton(`Test`, 100, 240, 100, 25, (w) => {       
-    const emojis = [...'🚗🚲🛴🚿🌒🌡☄🔥'];
-       w.addImage(`data:image/svg+xml,\
-%3Csvg%20xmlns='http://www\
-.w3.org/2000/svg'%20viewBox='0%200%\
-2020%2020'%3E%3Ctext%20x='0'%20\
-y='14'%3E${(
-         emojis.at(
-           int(random(0, emojis.length))
-         )
-       )}%3C/text%3E%3C/svg%3E`, 
-        random(0, w.width - 45), 
-        random(90, w.height) - 90, 
-        ...Array(2).fill(random(20, 40))
-       );
-    
-    
-    w.images.at(-1).image = loadImage(w.images.at(-1).url);
-    
-    w.title = w.title.replace(
-      /\s[0-9]+/g, 
-      ''
-    ) + ' ' + str(w.images.length - 1);
-  });
-  
-  
-  windowArray[0].addButton(`Get New Photo`, 60, 145, 180, 25, (w) => {
+
+  // Random Cat Photos
+  windowArray.push(new AppWindow({
+    x: random(windowWidth - 300), y: random(windowHeight - 220), 
+    width: 300, height: 220, 
+    title: 'Random Cat Photos',
+    iconUrl: 'icons/cat.png',
+    content: 'Use the button below to get a new photo'
+  }));
+  windowArray.at(-1).addButton(`Get New Photo`, 60, 145, 180, 25, (w) => {
     w.content = 'Loading...';
     
     fetch('https://thatcopy.pw/catapi/rest/')
@@ -106,8 +34,69 @@ y='14'%3E${(
         );
       });
   });
+
+  // Gariban Kedi
+  windowArray.push(new AppWindow({
+    x: random(windowWidth - 300), y: random(windowHeight - 330), 
+    width: 300, height: 330, 
+    title: 'Gariban Kedi',
+    iconUrl: 'icons/cat2.png',
+  }));
+  windowArray.at(-1).addImage(
+    `https://yinkar.github.io/pixelart/images/01-gariban-kedi.png`, 
+    0, 
+    0, 
+    292, 
+    290
+  );
+  windowArray.at(-1).addButton(`Test`, 100, 240, 100, 25, (w) => {       
+    const icons = [
+      'icons/cat.png',
+      'icons/cat2.png',
+      'icons/cat3.png',
+      'icons/cat4.png',
+      'icons/cube.png',
+      'icons/paint.png',
+      'icons/space-invaders.png',
+      'icons/rocket.png',
+    ];
+
+    w.addImage(
+      icons.at(
+        int(random(0, icons.length))
+      ).toString(), 
+      random(0, w.width - 45), 
+      random(90, w.height) - 90, 
+      ...Array(2).fill(random(20, 40))
+    );
   
-  windowArray[4].addButton(`Get New Fact`, 160, 85, 180, 25, (w) => {    
+    w.images.at(-1).image = loadImage(w.images.at(-1).url);
+    
+    w.title = w.title.replace(
+      /\s[0-9]+/g, 
+      ''
+    ) + ' ' + str(w.images.length - 1);
+  });
+
+  // Denek
+  windowArray.push(new AppWindow({
+    x: random(windowWidth - 280), y: random(windowHeight - 105), 
+    width: 280, height: 105, 
+    title: 'Denek',
+    iconUrl: 'icons/space-invaders.png',
+    content: '\n\tZaman yolcusu kalmasın'
+  }));
+  windowArray.at(-1).addImage(`icons/rocket.png`, 200, 10, 40, 40);
+  
+  // Random Cat Facts
+  windowArray.push(new AppWindow({
+    x: random(windowWidth - 500), y: random(windowHeight - 160),
+    width: 500, height: 160,
+    title: 'Random Cat Facts',
+    iconUrl: 'icons/cat4.png',
+    content: 'Use the button below to get a new fact'
+  }));
+  windowArray.at(-1).addButton(`Get New Fact`, 160, 85, 180, 25, (w) => {    
     fetch('https://meowfacts.herokuapp.com/')
       .then(r => r.json())
       .then(d => {
@@ -120,9 +109,15 @@ y='14'%3E${(
         w.content = croppedData;
       });
   });
-   windowArray[2].addImage(`data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Ctext%20x='0'%20y='14'%3E🚀%3C/text%3E%3C/svg%3E`, 40, 20, 40, 40);
-  
-  windowArray[5].addCanvas(0, 0, 392, 400, (c, w) => {
+
+  // Dummy Paint
+  windowArray.push(new AppWindow({
+    x: random(windowWidth - 400), y: random(windowHeight - 440),
+    width: 400, height: 440,
+    title: 'Dummy Paint',
+    iconUrl: 'icons/paint.png',
+  }));
+  windowArray.at(-1).addCanvas(0, 0, 392, 400, (c, w) => {
     c.background(255);
   }, (c, w) => {
     if (mouseIsPressed && w.zIndex === windowArray.length - 1 && !w.grabbed) {
@@ -143,8 +138,17 @@ y='14'%3E${(
       );
     }
   });
-  
-  windowArray[6].addCanvas(0, 0, 192, 160, (c, w) => {
+
+  // 3D Renderer
+  windowArray.push(new AppWindow({
+    x: random(windowWidth - 200), y: random(windowHeight - 240),
+    width: 200, height: 200,
+    title: '3D Renderer',
+    iconUrl: 'icons/cube.png',
+  }));
+  windowArray.at(-1).addCanvas(0, 0, 192, 160, (c, w) => {
+    w.vars.teapotModel = loadModel('teapot.obj');
+
     c.background(10);
   }, (c, w) => {
     c.background(10);
@@ -156,10 +160,13 @@ y='14'%3E${(
     c.rotateZ(PI * 3);
     c.rotateY(frameCount / 75);
     c.scale(24);
-    c.model(teapotModel);
+    c.model(w.vars.teapotModel);
     c.pop();
     
   }, true);
+
+  
+  
   
   windowArray.forEach((w, i) => {
     w.zIndex = i;
