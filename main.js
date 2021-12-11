@@ -314,7 +314,7 @@ function draw() {
     
     if (w.sideClicks.upLeft) {
       if (
-        mouseY + w.initialDimensions.height < w.y + w.height && 
+        mouseY + w.initialDimensions.height < w.y + w.height &&
         mouseX + w.initialDimensions.width < w.x + w.width
       ) {
         w.height += (w.y - mouseY);
@@ -640,6 +640,7 @@ function mousePressed() {
           mouseY < w.y + 2 + w.height
         ) {
           w.sideClicks.left = true;
+          w.grabbed = false;
         }
   
         // Right
@@ -650,6 +651,7 @@ function mousePressed() {
           mouseY < w.y + 2 + w.height
         ) {
           w.sideClicks.right = true;
+          w.grabbed = false;
         }
   
         // Down
@@ -660,6 +662,7 @@ function mousePressed() {
           mouseX < w.x + 2 + w.width
         ) {
           w.sideClicks.down = true;
+          w.grabbed = false;
         }
   
         // Up
@@ -670,6 +673,7 @@ function mousePressed() {
           mouseX < w.x + 2 + w.width
         ) {
           w.sideClicks.up = true;
+          w.grabbed = false;
         }
   
         // Down Left
@@ -680,6 +684,7 @@ function mousePressed() {
           mouseY < w.y + 4 + w.height
         ) {
           w.sideClicks.downLeft = true;
+          w.grabbed = false;
         }
   
         // Down Right
@@ -690,6 +695,7 @@ function mousePressed() {
           mouseY < w.y + 4 + w.height
         ) {
           w.sideClicks.downRight = true;
+          w.grabbed = false;
         }
   
         // Up Left
@@ -700,6 +706,7 @@ function mousePressed() {
           mouseY < w.y + 5
         ) {
           w.sideClicks.upLeft = true;
+          w.grabbed = false;
         }
   
         // Up Right
@@ -710,6 +717,7 @@ function mousePressed() {
           mouseY < w.y + 5
         ) {
           w.sideClicks.upRight = true;
+          w.grabbed = false;
         }
       }
   
