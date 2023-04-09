@@ -19,20 +19,16 @@ function setup() {
   windowArray.at(-1).addButton(`Get New Photo`, 60, 145, 180, 25, (w) => {
     w.content = 'Loading...';
     
-    fetch('https://thatcopy.pw/catapi/rest/')
-      .then(r => r.json())
-      .then(d => {
-        w.images.splice(-1);
-      
-        w.addImage(d.url, 0, 0, 292, 180, 0, 0, 4672, 2880);
+    w.images.splice(-1);
+  
+    w.addImage('https://cataas.com/cat/cute', 0, 0, 292, 180, 0, 0, 4672, 2880);
 
-        w.images.at(-1).image = loadImage(
-          w.images.at(-1).url, 
-          () => {
-            w.content = '';
-          }
-        );
-      });
+    w.images.at(-1).image = loadImage(
+      w.images.at(-1).url, 
+      () => {
+        w.content = '';
+      }
+    );
   });
 
   // Gariban Kedi
