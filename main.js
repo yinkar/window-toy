@@ -407,7 +407,6 @@ function draw() {
     }
 
     // Refactoring needed
-    
     if (w.sideClicks.left) {
       if (mouseX + w.initialDimensions.width < w.x + w.width) {
         w.width += (w.x - mouseX);
@@ -504,85 +503,40 @@ function draw() {
       )
     ) {
 
+      const setCursor = (x1, x2, y1, y2, cursorName) => {
+        if (
+          mouseX > w.x + x1 &&
+          mouseX < w.x + x2 &&
+          mouseY > w.y + y1 &&
+          mouseY < w.y + y2
+        ) {
+          cursor(cursorName)
+        }
+      };
+
       // Left
-      if (
-        mouseX > w.x - 0 &&
-        mouseX < w.x + 5 &&
-        mouseY > w.y + 0 &&
-        mouseY < w.y + 0 + w.height
-      ) {
-        cursor('ew-resize');
-      }
+      setCursor(0, 5, 0, w.height, 'ew-resize');
 
       // Right
-      if (
-        mouseX > w.x - 5 + w.width &&
-        mouseX < w.x + 0 + w.width &&
-        mouseY > w.y + 0 &&
-        mouseY < w.y + 0 + w.height
-      ) {
-        cursor('ew-resize');
-      }
+      setCursor(-5 + w.width, w.width, 0, w.height, 'ew-resize');
 
       // Down
-      if (
-        mouseY > w.y - 5 + w.height &&
-        mouseY < w.y + 0 + w.height &&
-        mouseX > w.x + 0 &&
-        mouseX < w.x + 0 + w.width
-      ) {
-        cursor('ns-resize');
-      }
+      setCursor(0, w.width, -5 + w.height, w.height, 'ns-resize');
 
       // Up
-      if (
-        mouseY > w.y - 5 &&
-        mouseY < w.y + 0 &&
-        mouseX > w.x + 0 &&
-        mouseX < w.x + 0 + w.width
-      ) {
-        cursor('ns-resize');
-      }
+      setCursor(0, w.width, -5, 0, 'ns-resize');
 
       // Down Left
-      if (
-        mouseX > w.x - 0 &&
-        mouseX < w.x + 5 &&
-        mouseY > w.y - 5 + w.height &&
-        mouseY < w.y + 0 + w.height
-      ) {
-        cursor('nesw-resize');
-      }
+      setCursor(0, 5, -5 + w.height, w.height, 'nesw-resize');
 
       // Down Right
-      if (
-        mouseX > w.x - 5 + w.width &&
-        mouseX < w.x + 0 + w.width &&
-        mouseY > w.y - 5 + w.height &&
-        mouseY < w.y + 0 + w.height
-      ) {
-        cursor('nwse-resize');
-      }
+      setCursor(-5 + w.width, w.width, -5 + w.height, w.height, 'nwse-resize');
 
       // Up Left
-      if (
-        mouseX > w.x - 0 &&
-        mouseX < w.x + 5 &&
-        mouseY > w.y - 0 &&
-        mouseY < w.y + 5
-      ) {
-        cursor('nwse-resize');
-      }
+      setCursor(0, 5, 0, 5, 'nwse-resize');
 
       // Up Right
-      if (
-        mouseX > w.x - 5 + w.width &&
-        mouseX < w.x + 0 + w.width &&
-        mouseY > w.y - 0 &&
-        mouseY < w.y + 5
-      ) {
-        cursor('nesw-resize');
-      }
+      setCursor(-5 + w.width, w.width, 0, 5, 'nesw-resize');
     }
 
 
@@ -757,94 +711,35 @@ function mousePressed() {
           })
         )
       ) {
+
+        const setGrabbed = (x1, x2, y1, y2, dir) => {
+          w.sideClicks[dir] = true;
+          w.grabbed = false;
+        };
   
         // Left
-        if (
-          mouseX > w.x - 2 &&
-          mouseX < w.x + 3 &&
-          mouseY > w.y + 2 &&
-          mouseY < w.y + 2 + w.height
-        ) {
-          w.sideClicks.left = true;
-          w.grabbed = false;
-        }
+        setGrabbed(-2, 3, 2, 2 + w.height, 'left');
   
         // Right
-        if (
-          mouseX > w.x - 3 + w.width &&
-          mouseX < w.x + 2 + w.width &&
-          mouseY > w.y + 2 &&
-          mouseY < w.y + 2 + w.height
-        ) {
-          w.sideClicks.right = true;
-          w.grabbed = false;
-        }
+        setGrabbed(-3 + w.width, 2 + w.width, 2, 2 + w.height, 'right');
   
         // Down
-        if (
-          mouseY > w.y - 3 + w.height &&
-          mouseY < w.y + 2 + w.height &&
-          mouseX > w.x + 2 &&
-          mouseX < w.x + 2 + w.width
-        ) {
-          w.sideClicks.down = true;
-          w.grabbed = false;
-        }
+        setGrabbed(2, 2 + w.width, -3 + w.height, 2 + w.height, 'down');
   
         // Up
-        if (
-          mouseY > w.y - 3 &&
-          mouseY < w.y + 2 &&
-          mouseX > w.x + 2 &&
-          mouseX < w.x + 2 + w.width
-        ) {
-          w.sideClicks.up = true;
-          w.grabbed = false;
-        }
+        setGrabbed(2, 2 + w.width, -3, 2, 'up');
   
         // Down Left
-        if (
-          mouseX > w.x - 4 &&
-          mouseX < w.x + 5 &&
-          mouseY > w.y - 5 + w.height &&
-          mouseY < w.y + 4 + w.height
-        ) {
-          w.sideClicks.downLeft = true;
-          w.grabbed = false;
-        }
+        setGrabbed(-4, 5, -5 + w.height, 4 + w.height, 'downLeft');
   
         // Down Right
-        if (
-          mouseX > w.x - 5 + w.width &&
-          mouseX < w.x + 4 + w.width &&
-          mouseY > w.y - 5 + w.height &&
-          mouseY < w.y + 4 + w.height
-        ) {
-          w.sideClicks.downRight = true;
-          w.grabbed = false;
-        }
+        setGrabbed(-5, 4, -5 + w.height, 4 + w.height, 'downRight');
   
         // Up Left
-        if (
-          mouseX > w.x - 4 &&
-          mouseX < w.x + 5 &&
-          mouseY > w.y - 4 &&
-          mouseY < w.y + 5
-        ) {
-          w.sideClicks.upLeft = true;
-          w.grabbed = false;
-        }
+        setGrabbed(-4, 5, -4, 5, 'upLeft');
   
         // Up Right
-        if (
-          mouseX > w.x - 5 + w.width &&
-          mouseX < w.x + 4 + w.width &&
-          mouseY > w.y - 4 &&
-          mouseY < w.y + 5
-        ) {
-          w.sideClicks.upRight = true;
-          w.grabbed = false;
-        }
+        setGrabbed(-5 + w.width, 4 + w.width, -4, 5, 'upRight');
       }
   
     
